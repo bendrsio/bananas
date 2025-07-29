@@ -1,4 +1,4 @@
-import { ITextModel } from "../types";
+import { ITextModel } from "../../shared/types";
 
 export class StringModel implements ITextModel {
   private text: string = "";

@@ -1,6 +1,4 @@
-export interface IElectronAPI {
-  getInitialText: () => Promise<string>;
-}
+export interface IElectronAPI {}
 
 declare global {
   interface Window {

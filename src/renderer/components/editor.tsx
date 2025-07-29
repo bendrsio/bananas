@@ -7,14 +7,6 @@ interface EditorProps {
 const Editor: React.FC<EditorProps> = ({ text: initialText }) => {
   const [text, setText] = useState<string>(initialText);
 
-  useEffect(() => {
-    const fetchText = async () => {
-      const initialText = await window.electronAPI.getInitialText();
-      setText(initialText);
-    };
-    fetchText();
-  }, []);
-
   const handleChange = (event: React.ChangeEvent<HTMLTextAreaElement>) => {
     setText(event.target.value);
   };

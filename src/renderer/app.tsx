@@ -12,6 +12,6 @@ root.render(
       flexDirection: "column",
     }}
   >
-    <Editor text="" />
+    <Editor text="Hello, world!" />
   </div>
 );
