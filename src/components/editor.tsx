@@ -1,7 +1,19 @@
-import React, { useState } from "react";
+import React, { useState, useEffect } from "react";
 
-const Editor: React.FC = () => {
-  const [text, setText] = useState<string>("");
+interface EditorProps {
+  text: string;
+}
+
+const Editor: React.FC<EditorProps> = ({ text: initialText }) => {
+  const [text, setText] = useState<string>(initialText);
+
+  useEffect(() => {
+    const fetchText = async () => {
+      const initialText = await window.electronAPI.getInitialText();
+      setText(initialText);
+    };
+    fetchText();
+  }, []);
 
   const handleChange = (event: React.ChangeEvent<HTMLTextAreaElement>) => {
     setText(event.target.value);

@@ -2,6 +2,7 @@ import { createRoot } from "react-dom/client";
 import Editor from "./components/editor";
 
 const root = createRoot(document.body);
+
 root.render(
   <div
     style={{
@@ -11,6 +12,6 @@ root.render(
       flexDirection: "column",
     }}
   >
-    <Editor />
+    <Editor text="" />
   </div>
 );
