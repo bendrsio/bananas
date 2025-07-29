@@ -16,8 +16,6 @@ const Editor: React.FC = () => {
         padding: "20px",
         fontSize: "16px",
         fontFamily: "monospace",
-        resize: "none",
-        boxSizing: "border-box",
         outline: "none",
         // backgroundColor: "#282c34",
         // color: "#abb2bf",

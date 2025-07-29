@@ -11,7 +11,6 @@ root.render(
       flexDirection: "column",
     }}
   >
-    <h1>Text Editor</h1>
     <Editor />
   </div>
 );
