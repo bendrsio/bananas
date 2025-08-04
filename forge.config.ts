@@ -14,6 +14,8 @@ import { rendererConfig } from "./webpack.renderer.config";
 const config: ForgeConfig = {
   packagerConfig: {
     asar: true,
+    icon: "./src/assets/icon.icns",
+    appCopyright: "@bendrsio https://x.com/bendrsio",
   },
   rebuildConfig: {},
   makers: [
