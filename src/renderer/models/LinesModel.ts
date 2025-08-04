@@ -3,6 +3,10 @@ import { ITextModel } from "../../shared/types";
 export class LinesModel implements ITextModel {
   private lines: string[] = [];
 
+  constructor(initialText: string) {
+    this.lines = initialText.split("\n");
+  }
+
   insert(index: number, text: string): void {
     this.lines.splice(index, 0, text);
   }

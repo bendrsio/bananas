@@ -1,34 +1,72 @@
-import React, { useState, useEffect } from "react";
+import React, {
+  useState,
+  forwardRef,
+  useImperativeHandle,
+  useRef,
+} from "react";
+import { CursorPosition, EditorView } from "../../shared/types";
 
 interface EditorProps {
   text: string;
+  onKeyDown?: (
+    event: React.KeyboardEvent<HTMLTextAreaElement>,
+    cursorIndex: number
+  ) => void;
+  onSelectionChange?: (selectionStart: number, selectionEnd: number) => void;
 }
 
-const Editor: React.FC<EditorProps> = ({ text: initialText }) => {
-  const [text, setText] = useState<string>(initialText);
+const Editor = forwardRef<EditorView, EditorProps>(
+  ({ text: initialText, onKeyDown, onSelectionChange }, ref) => {
+    const [text, setText] = useState<string>(initialText);
+    const textareaRef = useRef<HTMLTextAreaElement>(null);
 
-  const handleChange = (event: React.ChangeEvent<HTMLTextAreaElement>) => {
-    setText(event.target.value);
-  };
+    useImperativeHandle(ref, () => ({
+      render: (newText: string) => {
+        setText(newText);
+      },
+      setCursorPosition: (position: CursorPosition) => {
+        if (textareaRef.current) {
+          const pos = position.char;
+          textareaRef.current.setSelectionRange(pos, pos);
+          textareaRef.current.focus();
+        }
+      },
+    }));
 
-  return (
-    <textarea
-      style={{
-        width: "100%",
-        height: "100%",
-        border: "none",
-        padding: "20px",
-        fontSize: "16px",
-        fontFamily: "monospace",
-        outline: "none",
-        // backgroundColor: "#282c34",
-        // color: "#abb2bf",
-      }}
-      value={text}
-      onChange={handleChange}
-      placeholder="Start typing here..."
-    />
-  );
-};
+    const handleKeyDown = (event: React.KeyboardEvent<HTMLTextAreaElement>) => {
+      if (onKeyDown && textareaRef.current) {
+        onKeyDown(event, textareaRef.current.selectionStart);
+      }
+    };
+
+    const handleSelect = () => {
+      if (onSelectionChange && textareaRef.current) {
+        onSelectionChange(
+          textareaRef.current.selectionStart,
+          textareaRef.current.selectionEnd
+        );
+      }
+    };
+
+    return (
+      <textarea
+        ref={textareaRef}
+        style={{
+          width: "100%",
+          height: "100%",
+          border: "none",
+          padding: "20px",
+          fontSize: "16px",
+          fontFamily: "monospace",
+          outline: "none",
+        }}
+        value={text}
+        onKeyDown={handleKeyDown}
+        onSelect={handleSelect}
+        placeholder="Start typing here..."
+      />
+    );
+  }
+);
 
 export default Editor;

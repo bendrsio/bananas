@@ -3,6 +3,10 @@ import { ITextModel } from "../../shared/types";
 export class StringModel implements ITextModel {
   private text: string = "";
 
+  constructor(initialText: string) {
+    this.text = initialText;
+  }
+
   insert(index: number, text: string): void {
     this.text = this.text.slice(0, index) + text + this.text.slice(index);
   }
