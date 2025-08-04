@@ -1,8 +1,8 @@
 {
   "name": "text-editor",
-  "productName": "text-editor",
-  "version": "1.0.0",
-  "description": "My Electron application description",
+  "productName": "Text Editor",
+  "version": "0.0.2",
+  "description": "A simple text editor built with Electron and React.",
   "main": ".webpack/main",
   "scripts": {
     "start": "electron-forge start",
@@ -13,8 +13,9 @@
   },
   "keywords": [],
   "author": {
-    "name": "bendrsio",
-    "email": "benjy.desprets@gmail.com"
+    "name": "Ben Desprets",
+    "email": "benjy.desprets@gmail.com",
+    "url": "https://x.com/bendrsio"
   },
   "license": "MIT",
   "devDependencies": {
