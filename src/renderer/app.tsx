@@ -30,7 +30,6 @@ const App = () => {
     >
       <Editor
         ref={editorRef}
-        text=""
         onKeyDown={controller?.handleKeyDown}
         onSelectionChange={controller?.handleCursorChange}
       />

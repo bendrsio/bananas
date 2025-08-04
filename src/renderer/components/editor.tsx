@@ -7,7 +7,6 @@ import React, {
 import { CursorPosition, EditorView } from "../../shared/types";
 
 interface EditorProps {
-  text: string;
   onKeyDown?: (
     event: React.KeyboardEvent<HTMLTextAreaElement>,
     cursorIndex: number
@@ -16,8 +15,8 @@ interface EditorProps {
 }
 
 const Editor = forwardRef<EditorView, EditorProps>(
-  ({ text: initialText, onKeyDown, onSelectionChange }, ref) => {
-    const [text, setText] = useState<string>(initialText);
+  ({ onKeyDown, onSelectionChange }, ref) => {
+    const [text, setText] = useState<string>("");
     const textareaRef = useRef<HTMLTextAreaElement>(null);
 
     useImperativeHandle(ref, () => ({
