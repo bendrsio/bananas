@@ -58,6 +58,9 @@ const Editor = forwardRef<EditorView, EditorProps>(
           fontSize: "16px",
           fontFamily: "monospace",
           outline: "none",
+          backgroundColor: "#282c34",
+          color: "#abb2bf",
+          resize: "none",
         }}
         value={text}
         onKeyDown={handleKeyDown}
