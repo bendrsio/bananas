@@ -28,6 +28,11 @@ export class EditorController {
         this.view.render(this.model.getAll() || "");
         this.view.setCursorPosition({ line: 0, char: cursorIndex - 1 });
       }
+    } else if (event.key === "Enter") {
+      event.preventDefault();
+      this.model.insert(cursorIndex, "\n");
+      this.view.render(this.model.getAll() || "");
+      this.view.setCursorPosition({ line: 0, char: cursorIndex + 1 });
     }
   };
 
