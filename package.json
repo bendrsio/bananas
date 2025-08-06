@@ -1,8 +1,8 @@
 {
-  "name": "text-editor",
-  "productName": "Text Editor",
+  "name": "bananas",
+  "productName": "Bananas",
   "version": "0.0.2",
-  "description": "A simple text editor built with Electron and React.",
+  "description": "A simple Bananas built with Electron and React.",
   "main": ".webpack/main",
   "scripts": {
     "start": "electron-forge start",
