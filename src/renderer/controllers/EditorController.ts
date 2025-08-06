@@ -1,4 +1,4 @@
-import { ITextModel, EditorView, CursorPosition } from "../../shared/types";
+import { ITextModel, EditorView } from "../../shared/types";
 
 export class EditorController {
   private model: ITextModel;
@@ -9,37 +9,33 @@ export class EditorController {
     this.view = view;
 
     this.view.render(this.model.getAll() || "");
-    this.view.setCursorPosition({ line: 0, char: 0 });
   }
 
   public handleKeyDown = (
-    event: React.KeyboardEvent<HTMLTextAreaElement>,
-    cursorIndex: number
+    event: React.KeyboardEvent<HTMLTextAreaElement>
   ): void => {
+    // TODO: handle this properly lmao
     if (event.key.length === 1 && !event.ctrlKey && !event.metaKey) {
       event.preventDefault();
-      this.model.insert(cursorIndex, event.key);
-      this.view.render(this.model.getAll() || "");
-      this.view.setCursorPosition({ line: 0, char: cursorIndex + 1 });
+      this.model.insertChar(event.key);
     } else if (event.key === "Backspace") {
       event.preventDefault();
-      if (cursorIndex > 0) {
-        this.model.delete(cursorIndex - 1, 1);
-        this.view.render(this.model.getAll() || "");
-        this.view.setCursorPosition({ line: 0, char: cursorIndex - 1 });
-      }
+      this.model.deleteChar();
     } else if (event.key === "Enter") {
       event.preventDefault();
-      this.model.insert(cursorIndex, "\n");
-      this.view.render(this.model.getAll() || "");
-      this.view.setCursorPosition({ line: 0, char: cursorIndex + 1 });
+      this.model.insertChar("\n");
+    } else if (event.key === "ArrowLeft") {
+      event.preventDefault();
+      this.model.moveCursorLeft();
+    } else if (event.key === "ArrowRight") {
+      event.preventDefault();
+      this.model.moveCursorRight();
+    } else if (event.key === "ArrowUp") {
+      event.preventDefault();
+      // this.model.moveCursorUp();
+    } else if (event.key === "ArrowDown") {
+      event.preventDefault();
+      // this.model.moveCursorDown();
     }
-  };
-
-  public handleCursorChange = (
-    selectionStart: number,
-    selectionEnd: number
-  ): void => {
-    console.log("Selection changed:", selectionStart, selectionEnd);
   };
 }

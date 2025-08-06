@@ -1,17 +1,17 @@
-import React, { useRef, useEffect, useState, useCallback } from "react";
+import React, { useState, useCallback } from "react";
 import { createRoot } from "react-dom/client";
 import Editor from "./components/editor";
 import { EditorView } from "../shared/types";
-import { StringModel } from "./models/StringModel";
 import { EditorController } from "./controllers/EditorController";
+import { LinesModel } from "./models/LinesModel";
 
 const App = () => {
   const [controller, setController] = useState<EditorController | null>(null);
+  const [model] = useState(() => new LinesModel(""));
 
   const editorRef = useCallback(
     (editorView: EditorView | null) => {
       if (editorView && !controller) {
-        const model = new StringModel("");
         const newController = new EditorController(model, editorView);
         setController(newController);
       }
@@ -31,7 +31,8 @@ const App = () => {
       <Editor
         ref={editorRef}
         onKeyDown={controller?.handleKeyDown}
-        onSelectionChange={controller?.handleCursorChange}
+        model={model}
+        // onSelectionChange={controller?.handleCursorChange}
       />
     </div>
   );

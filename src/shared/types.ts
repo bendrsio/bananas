@@ -1,8 +1,17 @@
-export interface ITextModel {
-  insert(index: number, text: string): void;
-  delete(index: number, count: number): void;
+import { EventEmitter } from "events";
+
+export interface ITextModel extends EventEmitter {
+  insert(line: number, index: number, text: string): void;
+  delete(line: number, index: number, count: number): void;
   getChar(line: number, char: number): string | undefined;
+  getLine(line: number): string | undefined;
   getAll(): string | undefined;
+  getCursor(): CursorPosition;
+  setCursor(position: CursorPosition): void;
+  insertChar(char: string): void;
+  deleteChar(): void;
+  moveCursorLeft(): void;
+  moveCursorRight(): void;
 }
 
 export interface TextChange {
@@ -25,4 +34,9 @@ export interface SelectionRange {
 export interface EditorView {
   render(text: string): void;
   setCursorPosition(position: CursorPosition): void;
+}
+
+export enum ModelEventType {
+  CONTENT_CHANGED = "contentChanged",
+  CURSOR_MOVED = "cursorMoved",
 }

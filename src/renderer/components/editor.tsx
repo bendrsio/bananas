@@ -3,48 +3,89 @@ import React, {
   forwardRef,
   useImperativeHandle,
   useRef,
+  useEffect,
 } from "react";
-import { CursorPosition, EditorView } from "../../shared/types";
+import {
+  CursorPosition,
+  EditorView,
+  ITextModel,
+  ModelEventType,
+} from "../../shared/types";
 
 interface EditorProps {
-  onKeyDown?: (
-    event: React.KeyboardEvent<HTMLTextAreaElement>,
-    cursorIndex: number
-  ) => void;
-  onSelectionChange?: (selectionStart: number, selectionEnd: number) => void;
+  onKeyDown?: (event: React.KeyboardEvent<HTMLTextAreaElement>) => void;
+  model: ITextModel;
 }
 
 const Editor = forwardRef<EditorView, EditorProps>(
-  ({ onKeyDown, onSelectionChange }, ref) => {
+  ({ onKeyDown, model }, ref) => {
     const [text, setText] = useState<string>("");
+    const [cursorPosition, setCursorPosition] = useState<CursorPosition>({
+      line: 0,
+      char: 0,
+    });
+
     const textareaRef = useRef<HTMLTextAreaElement>(null);
+
+    // Initial focus on mount
+    useEffect(() => {
+      textareaRef.current?.focus();
+    }, []);
+
+    useEffect(() => {
+      const handleContentChange = () => {
+        const newText = model.getAll();
+        // console.log("View: handleContentChange - setting text to:", newText);
+        setText(newText);
+      };
+
+      const handleCursorChange = (newPos: CursorPosition) => {
+        // console.log("View: handleCursorChange - setting cursor to:", newPos);
+        setCursorPosition(newPos);
+      };
+
+      setText(model.getAll());
+      setCursorPosition(model.getCursor());
+
+      model.on(ModelEventType.CONTENT_CHANGED, handleContentChange);
+      model.on(ModelEventType.CURSOR_MOVED, handleCursorChange);
+
+      return () => {
+        model.off(ModelEventType.CONTENT_CHANGED, handleContentChange);
+        model.off(ModelEventType.CURSOR_MOVED, handleCursorChange);
+      };
+    }, [model]);
+
+    useEffect(() => {
+      if (textareaRef.current) {
+        const textarea = textareaRef.current;
+        const currentTextValue = textarea.value;
+
+        let pos = 0;
+        const lines = currentTextValue.split("\n");
+
+        for (let i = 0; i < cursorPosition.line && i < lines.length; i++) {
+          pos += lines[i].length + 1;
+        }
+        pos += cursorPosition.char;
+
+        pos = Math.min(pos, currentTextValue.length);
+
+        textarea.setSelectionRange(pos, pos);
+      }
+    }, [cursorPosition, text]);
 
     useImperativeHandle(ref, () => ({
       render: (newText: string) => {
         setText(newText);
       },
-      setCursorPosition: (position: CursorPosition) => {
-        if (textareaRef.current) {
-          const pos = position.char;
-          textareaRef.current.setSelectionRange(pos, pos);
-          textareaRef.current.focus();
-        }
+      setCursorPosition: (newPos: CursorPosition) => {
+        setCursorPosition(newPos);
       },
     }));
 
     const handleKeyDown = (event: React.KeyboardEvent<HTMLTextAreaElement>) => {
-      if (onKeyDown && textareaRef.current) {
-        onKeyDown(event, textareaRef.current.selectionStart);
-      }
-    };
-
-    const handleSelect = () => {
-      if (onSelectionChange && textareaRef.current) {
-        onSelectionChange(
-          textareaRef.current.selectionStart,
-          textareaRef.current.selectionEnd
-        );
-      }
+      onKeyDown?.(event);
     };
 
     return (
@@ -64,7 +105,6 @@ const Editor = forwardRef<EditorView, EditorProps>(
         }}
         value={text}
         onKeyDown={handleKeyDown}
-        onSelect={handleSelect}
         placeholder="Start typing here..."
       />
     );
