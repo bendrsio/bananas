@@ -9,8 +9,6 @@ export class EditorController {
     this.view = view;
   }
 
-  // Removed direct DOM responsibility; title is managed by a view-layer component
-
   public handleKeyDown = (
     event: React.KeyboardEvent<HTMLTextAreaElement>
   ): void => {
@@ -52,15 +50,28 @@ export class EditorController {
   };
 
   public handleOpenFile = async () => {
-    const result = await window.electronAPI.openFile();
-    if (result) {
-      this.model.setContent(result.content);
-      this.model.setFileInfo({
-        filePath: result.filePath,
-        fileName: result.fileName,
-      });
-      this.model.setDirty(false);
+    if (this.model.isDirty()) {
+      const response = await window.electronAPI.confirmSaveBeforeNew();
+      if (response === 2) {
+        return;
+      }
+      if (response === 0) {
+        const saved = await this.handleSaveFile();
+        if (!saved) {
+          return;
+        }
+      }
+      // response === 1 (Don't Save) falls through to open
     }
+
+    const result = await window.electronAPI.openFile();
+    if (!result) return;
+    this.model.setContent(result.content);
+    this.model.setFileInfo({
+      filePath: result.filePath,
+      fileName: result.fileName,
+    });
+    this.model.setDirty(false);
   };
 
   public handleSaveFile = async (): Promise<boolean> => {
