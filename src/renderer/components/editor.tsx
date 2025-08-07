@@ -14,11 +14,12 @@ import {
 
 interface EditorProps {
   onKeyDown?: (event: React.KeyboardEvent<HTMLTextAreaElement>) => void;
+  onCursorSelect?: (position: CursorPosition) => void;
   model: ITextModel;
 }
 
 const Editor = forwardRef<EditorView, EditorProps>(
-  ({ onKeyDown, model }, ref) => {
+  ({ onKeyDown, onCursorSelect, model }, ref) => {
     const [text, setText] = useState<string>("");
     const [cursorPosition, setCursorPosition] = useState<CursorPosition>({
       line: 0,
@@ -35,17 +36,12 @@ const Editor = forwardRef<EditorView, EditorProps>(
     useEffect(() => {
       const handleContentChange = () => {
         const newText = model.getAll();
-        // console.log("View: handleContentChange - setting text to:", newText);
         setText(newText);
       };
 
       const handleCursorChange = (newPos: CursorPosition) => {
-        // console.log("View: handleCursorChange - setting cursor to:", newPos);
         setCursorPosition(newPos);
       };
-
-      setText(model.getAll());
-      setCursorPosition(model.getCursor());
 
       model.on(ModelEventType.CONTENT_CHANGED, handleContentChange);
       model.on(ModelEventType.CURSOR_MOVED, handleCursorChange);
@@ -88,6 +84,27 @@ const Editor = forwardRef<EditorView, EditorProps>(
       onKeyDown?.(event);
     };
 
+    const handleClick = (event: React.MouseEvent<HTMLTextAreaElement>) => {
+      const textarea = event.currentTarget;
+      const cursorPosition = textarea.selectionStart;
+
+      let line = 0;
+      let char = 0;
+      const lines = textarea.value.split("\n");
+
+      let charactersSum = 0;
+      for (let i = 0; i < lines.length; i++) {
+        if (charactersSum + lines[i].length + 1 > cursorPosition) {
+          line = i;
+          char = cursorPosition - charactersSum;
+          break;
+        }
+        charactersSum += lines[i].length + 1;
+      }
+
+      onCursorSelect?.({ line, char });
+    };
+
     return (
       <textarea
         ref={textareaRef}
@@ -105,6 +122,7 @@ const Editor = forwardRef<EditorView, EditorProps>(
         }}
         value={text}
         onKeyDown={handleKeyDown}
+        onClick={handleClick}
         placeholder="Start typing here..."
       />
     );

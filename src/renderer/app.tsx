@@ -31,8 +31,8 @@ const App = () => {
       <Editor
         ref={editorRef}
         onKeyDown={controller?.handleKeyDown}
+        onCursorSelect={controller?.handleCursorSelect}
         model={model}
-        // onSelectionChange={controller?.handleCursorChange}
       />
     </div>
   );

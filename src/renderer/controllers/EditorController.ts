@@ -1,4 +1,4 @@
-import { ITextModel, EditorView } from "../../shared/types";
+import { ITextModel, EditorView, CursorPosition } from "../../shared/types";
 
 export class EditorController {
   private model: ITextModel;
@@ -37,5 +37,9 @@ export class EditorController {
       event.preventDefault();
       this.model.moveCursorDown();
     }
+  };
+
+  public handleCursorSelect = (position: CursorPosition) => {
+    this.model.click(position.line, position.char);
   };
 }

@@ -121,4 +121,9 @@ export class LinesModel extends EventEmitter implements ITextModel {
     }
     this.setCursor({ line: this.cursor.line + 1, char: this.lastChar });
   }
+
+  click(line: number, char: number): void {
+    this.setCursor({ line, char });
+    this.lastChar = char;
+  }
 }

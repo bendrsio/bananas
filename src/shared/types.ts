@@ -14,6 +14,7 @@ export interface ITextModel extends EventEmitter {
   moveCursorRight(): void;
   moveCursorUp(): void;
   moveCursorDown(): void;
+  click(line: number, char: number): void;
 }
 
 export interface TextChange {
