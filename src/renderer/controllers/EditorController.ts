@@ -7,8 +7,6 @@ export class EditorController {
   constructor(model: ITextModel, view: EditorView) {
     this.model = model;
     this.view = view;
-
-    this.view.render(this.model.getAll() || "");
   }
 
   // Removed direct DOM responsibility; title is managed by a view-layer component
@@ -75,10 +73,10 @@ export class EditorController {
       this.model.setDirty(false);
       return true;
     }
-    const savedPath = await window.electronAPI.saveFile(content);
-    if (savedPath) {
-      const fileName = savedPath.split("/").pop() || savedPath;
-      this.model.setFileInfo({ filePath: savedPath, fileName });
+    const saved = await window.electronAPI.saveFile(content);
+    if (saved) {
+      const { filePath, fileName } = saved;
+      this.model.setFileInfo({ filePath, fileName });
       this.model.setDirty(false);
       return true;
     }
@@ -88,10 +86,10 @@ export class EditorController {
   public handleSaveAs = async () => {
     const content = this.model.getAll();
     if (!content) return;
-    const savedPath = await window.electronAPI.saveFile(content);
-    if (savedPath) {
-      const fileName = savedPath.split("/").pop() || savedPath;
-      this.model.setFileInfo({ filePath: savedPath, fileName });
+    const saved = await window.electronAPI.saveFile(content);
+    if (saved) {
+      const { filePath, fileName } = saved;
+      this.model.setFileInfo({ filePath, fileName });
       this.model.setDirty(false);
     }
   };

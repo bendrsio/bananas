@@ -40,7 +40,8 @@ ipcMain.handle("dialog:saveFile", async (_, content: string) => {
   if (!canceled && filePath) {
     const resolvedPath = path.extname(filePath) ? filePath : `${filePath}.md`;
     fs.writeFileSync(resolvedPath, content);
-    return resolvedPath;
+    const fileName = path.basename(resolvedPath);
+    return { filePath: resolvedPath, fileName };
   }
   return null;
 });

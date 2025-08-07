@@ -26,6 +26,7 @@ export class LinesModel extends EventEmitter implements ITextModel {
       this.lines[line] =
         currentLine.slice(0, index) + text + currentLine.slice(index);
       this.setCursor({ line, char: index + text.length });
+      this.lastChar = this.cursor.char;
     } else {
       const remaining = currentLine.slice(index);
       this.lines[line] = currentLine.slice(0, index) + newLines[0];
@@ -34,8 +35,9 @@ export class LinesModel extends EventEmitter implements ITextModel {
       const newCursorLine = line + newLines.length - 1;
       const newCursorChar = newLines[newLines.length - 1].length;
       this.setCursor({ line: newCursorLine, char: newCursorChar });
+      this.lastChar = this.cursor.char;
     }
-    this.dirty = true;
+    this.setDirty(true);
     this.emit(ModelEventType.CONTENT_CHANGED);
   }
 
@@ -44,7 +46,8 @@ export class LinesModel extends EventEmitter implements ITextModel {
     this.lines[line] =
       currentLine.slice(0, index - count) + currentLine.slice(index);
     this.setCursor({ line, char: index - count });
-    this.dirty = true;
+    this.setDirty(true);
+    this.lastChar = this.cursor.char;
     this.emit(ModelEventType.CONTENT_CHANGED);
   }
 
@@ -77,7 +80,6 @@ export class LinesModel extends EventEmitter implements ITextModel {
         });
       }
       this.emit(ModelEventType.CURSOR_MOVED, this.cursor);
-      console.log("setCursor", this.cursor);
     }
   }
 
@@ -94,6 +96,8 @@ export class LinesModel extends EventEmitter implements ITextModel {
       this.lines[this.cursor.line - 1] += this.lines[this.cursor.line];
       this.lines.splice(this.cursor.line, 1);
       this.setCursor({ line: this.cursor.line - 1, char: prevLineLength });
+      this.setDirty(true);
+      this.lastChar = this.cursor.char;
       this.emit(ModelEventType.CONTENT_CHANGED);
     }
   }
@@ -140,7 +144,7 @@ export class LinesModel extends EventEmitter implements ITextModel {
     this.lines = content.split("\n");
     this.setCursor({ line: 0, char: 0 });
     this.lastChar = 0;
-    this.dirty = false;
+    this.setDirty(false);
     this.emit(ModelEventType.CONTENT_CHANGED);
   }
 

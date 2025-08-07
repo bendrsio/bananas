@@ -4,7 +4,9 @@ export interface IElectronAPI {
     filePath: string;
     fileName: string;
   } | null>;
-  saveFile: (content: string) => Promise<string | null>;
+  saveFile: (
+    content: string
+  ) => Promise<{ filePath: string; fileName: string } | null>;
   writeFile: (filePath: string, content: string) => Promise<string>;
   confirmSaveBeforeNew: () => Promise<0 | 1 | 2>;
   onAttemptClose: (listener: () => void) => () => void;
