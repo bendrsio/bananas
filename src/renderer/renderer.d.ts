@@ -1,6 +1,12 @@
 export interface IElectronAPI {
-  openFile: () => Promise<string | null>;
+  openFile: () => Promise<{
+    content: string;
+    filePath: string;
+    fileName: string;
+  } | null>;
   saveFile: (content: string) => Promise<string | null>;
+  writeFile: (filePath: string, content: string) => Promise<string>;
+  confirmSaveBeforeNew: () => Promise<0 | 1 | 2>;
 }
 
 declare global {

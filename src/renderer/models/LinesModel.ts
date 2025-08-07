@@ -1,10 +1,17 @@
-import { CursorPosition, ITextModel, ModelEventType } from "../../shared/types";
+import {
+  CursorPosition,
+  ITextModel,
+  ModelEventType,
+  FileInfo,
+} from "../../shared/types";
 import { EventEmitter } from "events";
 
 export class LinesModel extends EventEmitter implements ITextModel {
   private lines: string[] = [];
   private cursor: CursorPosition = { line: 0, char: 0 };
   private lastChar: number = 0;
+  private fileInfo: FileInfo | null = null;
+  private dirty: boolean = false;
 
   constructor(initialText: string) {
     super();
@@ -28,6 +35,7 @@ export class LinesModel extends EventEmitter implements ITextModel {
       const newCursorChar = newLines[newLines.length - 1].length;
       this.setCursor({ line: newCursorLine, char: newCursorChar });
     }
+    this.dirty = true;
     this.emit(ModelEventType.CONTENT_CHANGED);
   }
 
@@ -36,6 +44,7 @@ export class LinesModel extends EventEmitter implements ITextModel {
     this.lines[line] =
       currentLine.slice(0, index - count) + currentLine.slice(index);
     this.setCursor({ line, char: index - count });
+    this.dirty = true;
     this.emit(ModelEventType.CONTENT_CHANGED);
   }
 
@@ -131,6 +140,23 @@ export class LinesModel extends EventEmitter implements ITextModel {
     this.lines = content.split("\n");
     this.setCursor({ line: 0, char: 0 });
     this.lastChar = 0;
+    this.dirty = false;
     this.emit(ModelEventType.CONTENT_CHANGED);
+  }
+
+  getFileInfo(): FileInfo | null {
+    return this.fileInfo;
+  }
+
+  setFileInfo(fileInfo: FileInfo | null): void {
+    this.fileInfo = fileInfo;
+  }
+
+  isDirty(): boolean {
+    return this.dirty;
+  }
+
+  setDirty(dirty: boolean): void {
+    this.dirty = dirty;
   }
 }

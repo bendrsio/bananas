@@ -42,21 +42,71 @@ export class EditorController {
     } else if (event.key === "s" && event.metaKey) {
       event.preventDefault();
       this.handleSaveFile();
+    } else if (event.key === "S" && event.metaKey && event.shiftKey) {
+      event.preventDefault();
+      this.handleSaveAs();
+    } else if (event.key === "n" && event.metaKey) {
+      event.preventDefault();
+      this.handleNewFile();
     }
   };
 
   public handleOpenFile = async () => {
     const result = await window.electronAPI.openFile();
     if (result) {
-      this.model.setContent(result);
+      this.model.setContent(result.content);
+      this.model.setFileInfo({
+        filePath: result.filePath,
+        fileName: result.fileName,
+      });
+      this.model.setDirty(false);
     }
   };
 
   public handleSaveFile = async () => {
     const content = this.model.getAll();
-    if (content) {
-      await window.electronAPI.saveFile(content);
+    if (!content) return;
+
+    const fileInfo = this.model.getFileInfo();
+    if (fileInfo?.filePath) {
+      await window.electronAPI.writeFile(fileInfo.filePath, content);
+      this.model.setDirty(false);
+      return;
     }
+    const savedPath = await window.electronAPI.saveFile(content);
+    if (savedPath) {
+      const fileName = savedPath.split("/").pop() || savedPath;
+      this.model.setFileInfo({ filePath: savedPath, fileName });
+      this.model.setDirty(false);
+    }
+  };
+
+  public handleSaveAs = async () => {
+    const content = this.model.getAll();
+    if (!content) return;
+    const savedPath = await window.electronAPI.saveFile(content);
+    if (savedPath) {
+      const fileName = savedPath.split("/").pop() || savedPath;
+      this.model.setFileInfo({ filePath: savedPath, fileName });
+      this.model.setDirty(false);
+    }
+  };
+
+  public handleNewFile = async () => {
+    if (!this.model.isDirty()) {
+      this.model.setContent("");
+      this.model.setFileInfo(null);
+      return;
+    }
+    const response = await window.electronAPI.confirmSaveBeforeNew();
+    if (response === 2) {
+      return; // Cancel
+    }
+    if (response === 0) {
+      await this.handleSaveFile();
+    }
+    this.model.setContent("");
+    this.model.setFileInfo(null);
   };
 
   public handleCursorSelect = (position: CursorPosition) => {

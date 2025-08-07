@@ -16,6 +16,10 @@ export interface ITextModel extends EventEmitter {
   moveCursorDown(): void;
   click(line: number, char: number): void;
   setContent(content: string): void;
+  getFileInfo(): FileInfo | null;
+  setFileInfo(fileInfo: FileInfo | null): void;
+  isDirty(): boolean;
+  setDirty(dirty: boolean): void;
 }
 
 export interface TextChange {
@@ -43,4 +47,9 @@ export interface EditorView {
 export enum ModelEventType {
   CONTENT_CHANGED = "contentChanged",
   CURSOR_MOVED = "cursorMoved",
+}
+
+export interface FileInfo {
+  filePath: string;
+  fileName: string;
 }
