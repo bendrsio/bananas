@@ -39,6 +39,9 @@ export class EditorController {
     } else if (event.key === "o" && event.metaKey) {
       event.preventDefault();
       this.handleOpenFile();
+    } else if (event.key === "s" && event.metaKey) {
+      event.preventDefault();
+      this.handleSaveFile();
     }
   };
 
@@ -46,6 +49,13 @@ export class EditorController {
     const result = await window.electronAPI.openFile();
     if (result) {
       this.model.setContent(result);
+    }
+  };
+
+  public handleSaveFile = async () => {
+    const content = this.model.getAll();
+    if (content) {
+      await window.electronAPI.saveFile(content);
     }
   };
 

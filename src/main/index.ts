@@ -22,6 +22,15 @@ ipcMain.handle("dialog:openFile", async () => {
   return null;
 });
 
+ipcMain.handle("dialog:saveFile", async (_, content: string) => {
+  const { canceled, filePath } = await dialog.showSaveDialog({});
+  if (!canceled && filePath) {
+    fs.writeFileSync(filePath, content);
+    return filePath;
+  }
+  return null;
+});
+
 const createWindow = (): void => {
   // Create the browser window.
   const mainWindow = new BrowserWindow({
