@@ -1,4 +1,6 @@
-export interface IElectronAPI {}
+export interface IElectronAPI {
+  openFile: () => Promise<string | null>;
+}
 
 declare global {
   interface Window {

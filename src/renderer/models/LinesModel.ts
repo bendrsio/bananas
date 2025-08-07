@@ -126,4 +126,11 @@ export class LinesModel extends EventEmitter implements ITextModel {
     this.setCursor({ line, char });
     this.lastChar = char;
   }
+
+  setContent(content: string): void {
+    this.lines = content.split("\n");
+    this.setCursor({ line: 0, char: 0 });
+    this.lastChar = 0;
+    this.emit(ModelEventType.CONTENT_CHANGED);
+  }
 }

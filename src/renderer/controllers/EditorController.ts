@@ -36,6 +36,16 @@ export class EditorController {
     } else if (event.key === "ArrowDown") {
       event.preventDefault();
       this.model.moveCursorDown();
+    } else if (event.key === "o" && event.metaKey) {
+      event.preventDefault();
+      this.handleOpenFile();
+    }
+  };
+
+  public handleOpenFile = async () => {
+    const result = await window.electronAPI.openFile();
+    if (result) {
+      this.model.setContent(result);
     }
   };
 
