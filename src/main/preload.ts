@@ -6,4 +6,11 @@ contextBridge.exposeInMainWorld("electronAPI", {
   writeFile: (filePath: string, content: string) =>
     ipcRenderer.invoke("file:write", filePath, content),
   confirmSaveBeforeNew: () => ipcRenderer.invoke("dialog:confirmSaveBeforeNew"),
+  onAttemptClose: (listener: () => void) => {
+    const wrapped = () => listener();
+    ipcRenderer.on("app:attempt-close", wrapped);
+    return () => ipcRenderer.removeListener("app:attempt-close", wrapped);
+  },
+  proceedClose: () => ipcRenderer.send("app:proceed-close"),
+  cancelClose: () => ipcRenderer.send("app:cancel-close"),
 });

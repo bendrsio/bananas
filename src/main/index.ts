@@ -79,6 +79,30 @@ const createWindow = (): void => {
 
   // Open the DevTools.
   // mainWindow.webContents.openDevTools();
+
+  // Intercept window close (Cmd+W or clicking close)
+  const canClose = new Set<number>();
+  mainWindow.on("close", (e) => {
+    if (!canClose.has(mainWindow.id)) {
+      e.preventDefault();
+      mainWindow.webContents.send("app:attempt-close");
+    } else {
+      canClose.delete(mainWindow.id);
+    }
+  });
+
+  // Listen for proceed/cancel from renderer
+  ipcMain.on("app:proceed-close", (event) => {
+    const win = BrowserWindow.fromWebContents(event.sender);
+    if (win) {
+      canClose.add(win.id);
+      win.close();
+    }
+  });
+
+  ipcMain.on("app:cancel-close", () => {
+    // no-op; keep window open
+  });
 };
 
 // This method will be called when Electron has finished
