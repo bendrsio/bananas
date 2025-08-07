@@ -123,7 +123,7 @@ const Editor = forwardRef<EditorView, EditorProps>(
         value={text}
         onKeyDown={handleKeyDown}
         onClick={handleClick}
-        placeholder="Start typing here..."
+        placeholder="⌘+O to open a file, ⌘+S to save."
       />
     );
   }
