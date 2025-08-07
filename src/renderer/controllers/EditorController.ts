@@ -63,22 +63,24 @@ export class EditorController {
     }
   };
 
-  public handleSaveFile = async () => {
+  public handleSaveFile = async (): Promise<boolean> => {
     const content = this.model.getAll();
-    if (!content) return;
+    if (!content) return false;
 
     const fileInfo = this.model.getFileInfo();
     if (fileInfo?.filePath) {
       await window.electronAPI.writeFile(fileInfo.filePath, content);
       this.model.setDirty(false);
-      return;
+      return true;
     }
     const savedPath = await window.electronAPI.saveFile(content);
     if (savedPath) {
       const fileName = savedPath.split("/").pop() || savedPath;
       this.model.setFileInfo({ filePath: savedPath, fileName });
       this.model.setDirty(false);
+      return true;
     }
+    return false;
   };
 
   public handleSaveAs = async () => {
@@ -103,7 +105,10 @@ export class EditorController {
       return; // Cancel
     }
     if (response === 0) {
-      await this.handleSaveFile();
+      const saved = await this.handleSaveFile();
+      if (!saved) {
+        return;
+      }
     }
     this.model.setContent("");
     this.model.setFileInfo(null);

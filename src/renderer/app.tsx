@@ -56,7 +56,11 @@ const CloseGuard: React.FC<{
         return;
       }
       if (res === 0) {
-        await controller?.handleSaveFile();
+        const saved = await controller?.handleSaveFile();
+        if (!saved) {
+          window.electronAPI.cancelClose();
+          return;
+        }
       }
       window.electronAPI.proceedClose();
     };
