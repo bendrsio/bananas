@@ -4,6 +4,7 @@ import { EventEmitter } from "events";
 export class LinesModel extends EventEmitter implements ITextModel {
   private lines: string[] = [];
   private cursor: CursorPosition = { line: 0, char: 0 };
+  private lastChar: number = 0;
 
   constructor(initialText: string) {
     super();
@@ -60,7 +61,14 @@ export class LinesModel extends EventEmitter implements ITextModel {
       position.char !== this.cursor.char
     ) {
       this.cursor = position;
+      if (this.cursor.char > this.lines[this.cursor.line].length) {
+        this.setCursor({
+          line: this.cursor.line,
+          char: this.lines[this.cursor.line].length,
+        });
+      }
       this.emit(ModelEventType.CURSOR_MOVED, this.cursor);
+      console.log("setCursor", this.cursor);
     }
   }
 
@@ -77,6 +85,7 @@ export class LinesModel extends EventEmitter implements ITextModel {
       this.lines[this.cursor.line - 1] += this.lines[this.cursor.line];
       this.lines.splice(this.cursor.line, 1);
       this.setCursor({ line: this.cursor.line - 1, char: prevLineLength });
+      this.emit(ModelEventType.CONTENT_CHANGED);
     }
   }
 
@@ -87,6 +96,7 @@ export class LinesModel extends EventEmitter implements ITextModel {
       const prevLineLength = this.lines[this.cursor.line - 1].length;
       this.setCursor({ line: this.cursor.line - 1, char: prevLineLength });
     }
+    this.lastChar = this.cursor.char;
   }
 
   moveCursorRight(): void {
@@ -95,5 +105,20 @@ export class LinesModel extends EventEmitter implements ITextModel {
     } else if (this.cursor.line < this.lines.length - 1) {
       this.setCursor({ line: this.cursor.line + 1, char: 0 });
     }
+    this.lastChar = this.cursor.char;
+  }
+
+  moveCursorUp(): void {
+    if (this.cursor.line <= 0) {
+      return;
+    }
+    this.setCursor({ line: this.cursor.line - 1, char: this.lastChar });
+  }
+
+  moveCursorDown(): void {
+    if (this.cursor.line >= this.lines.length - 1) {
+      return;
+    }
+    this.setCursor({ line: this.cursor.line + 1, char: this.lastChar });
   }
 }
