@@ -150,6 +150,7 @@ export class LinesModel extends EventEmitter implements ITextModel {
 
   setFileInfo(fileInfo: FileInfo | null): void {
     this.fileInfo = fileInfo;
+    this.emit(ModelEventType.FILE_INFO_CHANGED, this.fileInfo);
   }
 
   isDirty(): boolean {
@@ -157,6 +158,9 @@ export class LinesModel extends EventEmitter implements ITextModel {
   }
 
   setDirty(dirty: boolean): void {
-    this.dirty = dirty;
+    if (this.dirty !== dirty) {
+      this.dirty = dirty;
+      this.emit(ModelEventType.DIRTY_CHANGED, this.dirty);
+    }
   }
 }

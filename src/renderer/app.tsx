@@ -1,7 +1,7 @@
 import React, { useState, useCallback, useEffect } from "react";
 import { createRoot } from "react-dom/client";
 import Editor from "./components/editor";
-import { EditorView } from "../shared/types";
+import { EditorView, ModelEventType } from "../shared/types";
 import { EditorController } from "./controllers/EditorController";
 import { LinesModel } from "./models/LinesModel";
 
@@ -28,6 +28,7 @@ const App = () => {
         flexDirection: "column",
       }}
     >
+      <WindowTitleManager model={model} />
       <CloseGuard controller={controller} model={model} />
       <Editor
         ref={editorRef}
@@ -69,6 +70,24 @@ const CloseGuard: React.FC<{
       off();
     };
   }, [controller, model]);
+  return null;
+};
+
+const WindowTitleManager: React.FC<{ model: LinesModel }> = ({ model }) => {
+  useEffect(() => {
+    const update = () => {
+      const info = model.getFileInfo();
+      document.title = info?.fileName
+        ? `${info.fileName} - Bananas`
+        : "Bananas";
+    };
+    update();
+    const onFileInfo = () => update();
+    model.on(ModelEventType.FILE_INFO_CHANGED, onFileInfo);
+    return () => {
+      model.off(ModelEventType.FILE_INFO_CHANGED, onFileInfo);
+    };
+  }, [model]);
   return null;
 };
 

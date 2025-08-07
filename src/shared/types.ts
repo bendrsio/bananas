@@ -47,6 +47,8 @@ export interface EditorView {
 export enum ModelEventType {
   CONTENT_CHANGED = "contentChanged",
   CURSOR_MOVED = "cursorMoved",
+  FILE_INFO_CHANGED = "fileInfoChanged",
+  DIRTY_CHANGED = "dirtyChanged",
 }
 
 export interface FileInfo {

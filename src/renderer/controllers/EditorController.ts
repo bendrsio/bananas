@@ -11,6 +11,8 @@ export class EditorController {
     this.view.render(this.model.getAll() || "");
   }
 
+  // Removed direct DOM responsibility; title is managed by a view-layer component
+
   public handleKeyDown = (
     event: React.KeyboardEvent<HTMLTextAreaElement>
   ): void => {
