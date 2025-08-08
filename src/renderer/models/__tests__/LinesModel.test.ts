@@ -66,4 +66,27 @@ describe("LinesModel", () => {
     m.setDirty(true);
     expect(dirtySpy).toHaveBeenCalledWith(true);
   });
+
+  test("deleteChar deletes the last character of the line", () => {
+    const m = new LinesModel("abc");
+    m.setCursor({ line: 0, char: 3 });
+    m.deleteChar();
+    expect(m.getAll()).toBe("ab");
+    expect(m.getCursor()).toEqual({ line: 0, char: 2 });
+  });
+
+  test("model is dirty after changes", () => {
+    const m = new LinesModel("");
+    m.setDirty(false);
+    m.insertChar("x");
+    expect(m.isDirty()).toBe(true);
+  });
+
+  test("model is not dirty after changes that don't affect content", () => {
+    const m = new LinesModel("");
+    m.setDirty(false);
+    m.setCursor({ line: 0, char: 0 });
+    m.moveCursorDown();
+    expect(m.isDirty()).toBe(false);
+  });
 });
