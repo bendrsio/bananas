@@ -1,4 +1,5 @@
 import { ITextModel, EditorView, CursorPosition } from "../../shared/types";
+import { resolveCommand, isTextInsertion } from "./InputBindings";
 
 export class EditorController {
   private model: ITextModel;
@@ -12,40 +13,71 @@ export class EditorController {
   public handleKeyDown = (
     event: React.KeyboardEvent<HTMLTextAreaElement>
   ): void => {
-    // TODO: handle this properly lmao
-    if (event.key.length === 1 && !event.ctrlKey && !event.metaKey) {
+    const command = resolveCommand({
+      key: event.key,
+      metaKey: event.metaKey,
+      ctrlKey: event.ctrlKey,
+      shiftKey: event.shiftKey,
+      altKey: event.altKey,
+    });
+
+    if (
+      isTextInsertion({
+        key: event.key,
+        metaKey: event.metaKey,
+        ctrlKey: event.ctrlKey,
+        shiftKey: event.shiftKey,
+        altKey: event.altKey,
+      })
+    ) {
       event.preventDefault();
       this.model.insertChar(event.key);
-    } else if (event.key === "Backspace") {
-      event.preventDefault();
-      this.model.deleteChar();
-    } else if (event.key === "Enter") {
-      event.preventDefault();
-      this.model.insertChar("\n");
-    } else if (event.key === "ArrowLeft") {
-      event.preventDefault();
-      this.model.moveCursorLeft();
-    } else if (event.key === "ArrowRight") {
-      event.preventDefault();
-      this.model.moveCursorRight();
-    } else if (event.key === "ArrowUp") {
-      event.preventDefault();
-      this.model.moveCursorUp();
-    } else if (event.key === "ArrowDown") {
-      event.preventDefault();
-      this.model.moveCursorDown();
-    } else if (event.key === "o" && event.metaKey) {
-      event.preventDefault();
-      this.handleOpenFile();
-    } else if (event.key === "s" && event.metaKey) {
-      event.preventDefault();
-      this.handleSaveFile();
-    } else if (event.key === "S" && event.metaKey && event.shiftKey) {
-      event.preventDefault();
-      this.handleSaveAs();
-    } else if (event.key === "n" && event.metaKey) {
-      event.preventDefault();
-      this.handleNewFile();
+      return;
+    }
+
+    switch (command) {
+      case "BACKSPACE":
+        event.preventDefault();
+        this.model.deleteChar();
+        break;
+      case "ENTER":
+        event.preventDefault();
+        this.model.insertChar("\n");
+        break;
+      case "MOVE_LEFT":
+        event.preventDefault();
+        this.model.moveCursorLeft();
+        break;
+      case "MOVE_RIGHT":
+        event.preventDefault();
+        this.model.moveCursorRight();
+        break;
+      case "MOVE_UP":
+        event.preventDefault();
+        this.model.moveCursorUp();
+        break;
+      case "MOVE_DOWN":
+        event.preventDefault();
+        this.model.moveCursorDown();
+        break;
+      case "OPEN":
+        event.preventDefault();
+        this.handleOpenFile();
+        break;
+      case "SAVE":
+        event.preventDefault();
+        this.handleSaveFile();
+        break;
+      case "SAVE_AS":
+        event.preventDefault();
+        this.handleSaveAs();
+        break;
+      case "NEW":
+        event.preventDefault();
+        this.handleNewFile();
+        break;
+      default:
+        break;
     }
   };
 
